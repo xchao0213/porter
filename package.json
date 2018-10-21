@@ -1,0 +1,18 @@
+{
+  "name": "porter",
+  "version": "1.0.0",
+  "description": "Organize images into new locations",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "xchao0213@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "exif": "^0.6.0"
+  },
+  "devDependencies": {
+    "knex": "^0.15.2",
+    "mysql": "^2.16.0"
+  }
+}
