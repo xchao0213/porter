@@ -9,7 +9,8 @@
   "author": "xchao0213@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "exif": "^0.6.0"
+    "exif": "^0.6.0",
+    "hashids": "^1.2.2"
   },
   "devDependencies": {
     "knex": "^0.15.2",
