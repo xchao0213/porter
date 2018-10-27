@@ -61,7 +61,7 @@ async function fileDisplay(sourceDir) {
                     fs.mkdirSync(levelTwoPath)
                 }
 
-                var hashid = hashids.encodeHex(Buffer('' + exif.timestamp.getTime()).toString('hex'));
+                var hashid = hashids.encodeHex(Buffer(sourceName + exif.timestamp.getTime()/1000).toString('hex'));
                 var destName = hashid + '.jpg';
                 var destFull = theYear + '/' + theMonth + '/' + destName;
                 var destPath = levelTwoPath + '/' + destName;
