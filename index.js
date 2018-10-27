@@ -69,6 +69,11 @@ async function fileDisplay(sourceDir) {
             
                 // 移动文件到目标文件夹
                 fs.renameSync(sourcePath, destPath)
+
+                var deststats = await fsstat(destPath);
+                console.log("deststats" + deststats.isFile())
+
+                
                 try {
                     var dbres = await mysql('exif').insert({
                         name: destName,
