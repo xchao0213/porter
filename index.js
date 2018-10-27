@@ -10,18 +10,19 @@ const fsreaddir = promisify(fs.readdir);
 const fsstat = promisify(fs.stat);
 
 //源文件夹
-var sourceDir = path.resolve('/data/media/tmp');
+var sourceDi = path.resolve('/data/media/tmp');
 //目标文件夹
 var destDir = path.resolve('/data/media/photo');
 
 //调用文件遍历方法
-fileDisplay(sourceDir);
+fileDisplay(sourceDi);
 
 /**
  * 文件遍历方法
  * @param sourceDir 需要遍历的文件路径
  */
 async function fileDisplay(sourceDir) {
+    console.log("[0] Displaying: " + sourceDir)
     //根据文件路径读取文件，返回文件列表
     var files = await fsreaddir(sourceDir)
     // console.log(files)
