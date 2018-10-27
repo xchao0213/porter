@@ -74,22 +74,20 @@ async function fileDisplay(sourceDir) {
                 console.log("deststats" + deststats.isFile())
 
                 
-                try {
-                    var dbres = await mysql('exif').insert({
-                        name: destName,
-                        fullPath: destFull,
-                        destPath: destPath,
-                        make: exif.make,
-                        model: exif.model,
-                        timestamp: exif.timestamp,
-                        width: exif.width,
-                        height: exif.height,
-                        latitude: exif.latitude,
-                        longitude: exif.longitude
-                    })
-                } catch (error){
-                    console.log(error)
-                }
+                
+                var dbres = await mysql('exif').insert({
+                    name: destName,
+                    fullPath: destFull,
+                    destPath: destPath,
+                    make: exif.make,
+                    model: exif.model,
+                    timestamp: exif.timestamp,
+                    width: exif.width,
+                    height: exif.height,
+                    latitude: exif.latitude,
+                    longitude: exif.longitude
+                })
+                
                 console.log(dbres)
             
 
