@@ -37,11 +37,11 @@ async function fileDisplay(sourceDir) {
             // main(filedir, filename)
             sourcePath = filedir;
             sourceName = filename;
-            console.log("sourcePath: " + filedir)
+            console.log("[1] sourcePath: " + filedir)
             var exifData = await getEXIF(filedir)
             // console.log(exifData)
             var exif = extractExif(exifData);
-            // console.log(exif)
+            console.log('[2] getExif')
             // var theYear = timestamp.getFullYear();
             // var theMonth = timestamp.getMonth() + 1;
             if (exif.make && exif.model && exif.timestamp){
@@ -49,6 +49,7 @@ async function fileDisplay(sourceDir) {
                 // console.log(theYear)
                 var theMonth = exif.timestamp.getMonth() + 1;
                 // console.log(theMonth)
+                console.log('[3] Exif is ok')
                 //文件夹不存在，则新建
                 var levelOnePath = destDir + '/' + theYear;
                 var levelTwoPath = destDir + '/' + theYear + '/' + theMonth;
@@ -56,22 +57,25 @@ async function fileDisplay(sourceDir) {
                 // console.log(levelTwoPath);
                 if (!fs.existsSync(levelOnePath)) {
                     fs.mkdirSync(levelOnePath)
+                    console.log('[4] Makedir year')
                 }
                 if (!fs.existsSync(levelTwoPath)) {
                     fs.mkdirSync(levelTwoPath)
+                    console.log('[4] Makedir month')
                 }
 
                 var hashid = hashids.encodeHex(Buffer(sourceName + exif.timestamp.getTime()/1000).toString('hex'));
                 var destName = hashid + '.jpg';
                 var destFull = theYear + '/' + theMonth + '/' + destName;
                 var destPath = levelTwoPath + '/' + destName;
-                console.log('destPath: ' + destPath)
+                console.log('[5] destPath: ' + destPath)
             
                 // 移动文件到目标文件夹
                 fs.renameSync(sourcePath, destPath)
+                console.log('[6] Move file to dest')
 
-                var deststats = await fsstat(destPath);
-                console.log("deststats" + deststats.isFile())
+                // var deststats = await fsstat(destPath);
+                // console.log("deststats" + deststats.isFile())
 
                 
                 
@@ -88,12 +92,12 @@ async function fileDisplay(sourceDir) {
                     longitude: exif.longitude
                 })
                 
-                console.log(dbres)
+                console.log('[7] Insert to mysql' + dbres)
             
 
             }
             else{
-                console.log('Invalid exif info!')
+                console.log('[3] Invalid exif info!')
             }
             
         }
