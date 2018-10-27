@@ -10,17 +10,9 @@ const fsreaddir = promisify(fs.readdir);
 const fsstat = promisify(fs.stat);
 
 //源文件夹
-var sourceDir = path.resolve('/Data/Titan/test');
+var sourceDir = path.resolve('E:/Titan/test');
 //目标文件夹
-var destDir = path.resolve('/Data/Titan/dest');
-//exif数据
-var make;
-var model;
-var timestamp;
-var width;
-var height;
-var latitude;
-var longitude;
+var destDir = path.resolve('E:/Titan/dest');
 
 //调用文件遍历方法
 fileDisplay(sourceDir);
@@ -47,74 +39,98 @@ async function fileDisplay(sourceDir) {
             sourceName = filename;
             console.log("sourcePath: " + filedir)
             var exifData = await getEXIF(filedir)
-            if (exifData.image.Make) {
-
-                make = exifData.image.Make;
-                // console.log(make)
-                model = exifData.image.Model;
-                var exifinfo = exifData.exif;
-                // console.log(exifinfo)
-                // var ddd = exifinfo.CreateDate;
-                var datestr = exifinfo.CreateDate.replace(/:/, "-").replace(/:/, "-")
-                timestamp = new Date(datestr);
-                var theYear = timestamp.getFullYear();
-                var theMonth = timestamp.getMonth() + 1;
-                width = exifinfo.ExifImageWidth;
-                height = exifinfo.ExifImageHeight;
-                var gpsinfo = exifData.gps;
-                // console.log(gpsinfo)
-                latitude = JSON.stringify(gpsinfo.GPSLatitude);
-                longitude = JSON.stringify(gpsinfo.GPSLongitude);
-
-                // console.log(exif);
+            // console.log(exifData)
+            var exif = extractExif(exifData);
+            // console.log(exif)
+            // var theYear = timestamp.getFullYear();
+            // var theMonth = timestamp.getMonth() + 1;
+            if (exif.make && exif.model && exif.timestamp){
+                var theYear = exif.timestamp.getFullYear();
+                // console.log(theYear)
+                var theMonth = exif.timestamp.getMonth() + 1;
+                // console.log(theMonth)
                 //文件夹不存在，则新建
                 var levelOnePath = destDir + '/' + theYear;
                 var levelTwoPath = destDir + '/' + theYear + '/' + theMonth;
-                console.log(levelOnePath);
-                console.log(levelTwoPath);
+                // console.log(levelOnePath);
+                // console.log(levelTwoPath);
                 if (!fs.existsSync(levelOnePath)) {
                     fs.mkdirSync(levelOnePath)
                 }
                 if (!fs.existsSync(levelTwoPath)) {
                     fs.mkdirSync(levelTwoPath)
                 }
-                // console.log(filename + date.getTime())
-                var hashid = hashids.encodeHex(Buffer('' + timestamp.getTime()).toString('hex'));
-                // console.log(hashid)
+
+                var hashid = hashids.encodeHex(Buffer(exif.model + exif.timestamp.getTime()).toString('hex'));
                 var destName = hashid + '.jpg';
+                var destFull = theYear + '/' + theMonth + '/' + destName;
                 var destPath = levelTwoPath + '/' + destName;
                 console.log('destPath: ' + destPath)
-
+            
                 // 移动文件到目标文件夹
                 fs.renameSync(sourcePath, destPath)
-
                 try {
                     var dbres = await mysql('exif').insert({
-                        sourceName: sourceName,
-                        sourcePath: sourcePath,
-                        destName: destName,
+                        name: destName,
+                        fullPath: destFull,
                         destPath: destPath,
-                        make: make,
-                        model: model,
-                        timestamp: timestamp,
-                        width: width,
-                        height: height,
-                        latitude: latitude,
-                        longitude: longitude
+                        make: exif.make,
+                        model: exif.model,
+                        timestamp: exif.timestamp,
+                        width: exif.width,
+                        height: exif.height,
+                        latitude: exif.latitude,
+                        longitude: exif.longitude
                     })
                 } catch (error){
                     console.log(error)
                 }
                 console.log(dbres)
-                
+            
 
             }
+            else{
+                console.log('Invalid exif info!')
+            }
+            
         }
         if (isDir) {
             fileDisplay(filedir);//递归，如果是文件夹，就继续遍历该文件夹下面的文件
         }
         
     });
+    
+}
+
+/**
+ * 解析exif数据
+ */
+function extractExif(exifData){
+    if (!exifData){
+        console.log("ExifData is undefined!")
+        return {};
+    }
+    var exif = {};
+    if (exifData.image){
+        exif.make =exifData.image.Make;
+        exif.model = exifData.image.Model;
+    }
+    
+    if (exifData.exif){
+        exif.date = exifData.exif.CreateDate
+        if (exif.date){
+            var datestr = exif.date.replace(/:/, "-").replace(/:/, "-")
+            exif.timestamp = new Date(datestr);
+        }        
+        exif.width = exifData.exif.ExifImageWidth;
+        exif.height = exifData.exif.ExifImageHeight;
+    }
+
+    if (exifData.gps){
+        exif.latitude = JSON.stringify(exifData.gps.GPSLatitude);
+        exif.longitude = JSON.stringify(exifData.gps.GPSLongitude);
+    }
+    return exif;    
     
 }
 
@@ -144,4 +160,5 @@ function getEXIF(filePath) {
         });
     });
 }
+
 
