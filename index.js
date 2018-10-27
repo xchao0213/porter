@@ -10,9 +10,9 @@ const fsreaddir = promisify(fs.readdir);
 const fsstat = promisify(fs.stat);
 
 //源文件夹
-var sourceDir = path.resolve('E:/Titan/test');
+var sourceDir = path.resolve('/data/media/tmp');
 //目标文件夹
-var destDir = path.resolve('E:/Titan/dest');
+var destDir = path.resolve('/data/media/photo');
 
 //调用文件遍历方法
 fileDisplay(sourceDir);
